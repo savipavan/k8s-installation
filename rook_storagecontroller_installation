@@ -1,0 +1,80 @@
+https://www.youtube.com/watch?v=wIRMxl_oEMM
+
+lsb_release -a
+
+grep proc /proc/cpuinfo
+
+grep Mem /proc/meminfo
+
+git clone https://github.com/rook/rook.git
+
+grep -A2 Custom common.yaml
+
+grep -A2 kind common.yaml
+
+    useAllNodes: false
+
+    nodes:
+    - name: "172.17.4.201"
+#      devices: # specific devices to use for storage can be specified for each node
+      - name: "sdb"
+
+
+sudo fdisk -l
+
+/dev/xvdf
+
+find ~ -name storageclass.yaml
+
+
+kubectl get pv
+
+kubectl get pvc
+
+#######
+
+vim pvc.yaml
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: firstpvc
+  labels:
+    app: example
+spec:
+  storageClassName: rook-ceph-block
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+	  storage: 1Gi
+
+*******
+kubectl create -f pvc.yaml
+
+kubectl get pv
+
+kubectl get pvc
+
+******
+#Create pod to use PVC
+
+vim pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-pod
+spec:
+  volumes:
+    - name: firstpvc-vol
+      persistentVolumeClaim:
+	    claimName: firstpvc
+  containers:
+    - name: web-container
+	  image: nginx
+	  volumeMounts:
+	    - mountPath: "/mnt"
+		name: firstpvc-vol
+		
+kubectl get pods
